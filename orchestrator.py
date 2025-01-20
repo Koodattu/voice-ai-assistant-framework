@@ -9,6 +9,7 @@ from memory import MemoryManager
 
 class Orchestrator:
     def __init__(self, state: State, llm_module: LLMModule, tts_module: TTSModule):
+        print("[Orchestrator] Initializing orchestrator module.")
         self.state = state
         self.llm_module = llm_module
         self.tts_module = tts_module

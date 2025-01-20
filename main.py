@@ -11,19 +11,23 @@ from llm import LLMModule
 from orchestrator import Orchestrator
 
 def main():
+    print("[Main] Starting...")
     state = State()
 
+    print("[Main] Creating modules...")
     # Create module instances
     stt_module = STTModule(state)
     tts_module = TTSModule(state)
     llm_module = LLMModule(state)
     orchestrator = Orchestrator(state, llm_module, tts_module)
 
+    print("[Main] Starting threads...")
     # Threads
     stt_thread = threading.Thread(target=stt_module.run, name="STTThread", daemon=True)
     tts_thread = threading.Thread(target=tts_module.run, name="TTSThread", daemon=True)
     orchestrator_thread = threading.Thread(target=orchestrator.run, name="OrchestratorThread", daemon=True)
 
+    print("[Main] Starting modules...")
     # Start
     stt_thread.start()
     tts_thread.start()
@@ -37,6 +41,7 @@ def main():
 
     signal.signal(signal.SIGINT, signal_handler)
 
+    print("[Main] Ready. Press Ctrl+C to exit.")
     # Main thread wait loop
     try:
         while True:
