@@ -1,63 +1,25 @@
-# stt.py
-
 import time
-import traceback
 import logging
 from state import State
 from constants import AUDIO_DEVICE_INPUT_ID, WHISPER_MODEL
 from RealtimeSTT import AudioToTextRecorder
-
-# Adjust logging level if desired
-logging.basicConfig(level=logging.ERROR)
+import traceback
+from logger import logger
 
 class STTModule:
     def __init__(self, state: State):
-        print("[STT] Initializing STT module.")
+        logger.info("STTModule: Initializing STT module.")
         self.state = state
-        self.recorder = None  # Will be initialized in run()
 
-    def recording_start(self):
-        """Callback when recording starts."""
-        print("[STT] Recording started.")
-        with self.state.lock:
-            self.state.user_talking = True
-            print("[STT] Set state user_talking: True.")
-
-    def recording_stop(self):
-        """Callback when recording stops."""
-        print("[STT] Recording stopped.")
-        with self.state.lock:
-            self.state.user_talking = False
-            print("[STT] Set state user_talking: False.")
-
-    def process_text(self, text: str):
-        """Process the recognized text by sending it to the shared state."""
-        # Simple pre-processing: trim and ignore empty text.
-        text = text.strip()
-        if not text:
-            return
-
-        print("[STT] Transcribed text:", text)
-        # Update the timestamp for new messages.
-        with self.state.lock:
-            self.state.add_new_message(text)
-            self.state.last_message_timestamp = time.time()
-            print("[STT] Added new message to state.")
-
-    def run(self):
-        """Continuously capture audio and convert to text."""
-        print("[STT] Starting STT module.")
-
-        # Configure the recorder using parameters selected from our examples.
-        # These parameters are a balance between responsiveness and accuracy.
+        # Configure the recorder
         recorder_config = {
             'spinner': False,
             'model': WHISPER_MODEL,
             'use_microphone': True,
-            'input_device_index': AUDIO_DEVICE_INPUT_ID,  # using our constant
+            'input_device_index': AUDIO_DEVICE_INPUT_ID,  # using your constant
             'silero_sensitivity': 0.6,
             'silero_use_onnx': True,
-            'post_speech_silence_duration': 2.4,  # adjust as needed
+            'post_speech_silence_duration': 1,  # adjust as needed
             'min_length_of_recording': 0.0,
             'min_gap_between_recordings': 0.2,
             'enable_realtime_transcription': False,
@@ -67,25 +29,49 @@ class STTModule:
             'level': logging.ERROR
         }
 
+        # Initialize the recorder
         try:
-            # Use the recorder as a context manager.
-            with AudioToTextRecorder(**recorder_config) as recorder:
-                self.recorder = recorder
-                print("[STT] Recorder ready. Listening for speech...")
-                while True:
-                    # Check for shutdown signal
-                    with self.state.lock:
-                        if self.state.shutdown:
-                            print("[STT] Shutdown signal received.")
-                            break
-
-                    # The recorder's .text() method calls our process_text() callback whenever new
-                    # transcription output is available.
-                    recorder.text(self.process_text)
-                    time.sleep(0.1)
+            self.recorder = AudioToTextRecorder(**recorder_config)
+            logger.info("STTModule: Recorder initialized successfully.")
         except Exception as e:
-            print("[STT] Exception:", e)
-            traceback.print_exc()
-            time.sleep(1)
+            logger.error(f"STTModule: Failed to initialize AudioToTextRecorder: {e}")
+            self.recorder = None
 
-        print("[STT] Exiting STT module.")
+    def recording_start(self):
+        """Callback when recording starts."""
+        logger.info("STTModule: Recording started.")
+        self.state.user_talking = True
+        logger.debug("STTModule: Set state user_talking to True.")
+
+    def recording_stop(self):
+        """Callback when recording stops."""
+        logger.info("STTModule: Recording stopped.")
+        self.state.user_talking = False
+        logger.debug("STTModule: Set state user_talking to False.")
+
+    def process_text(self, text: str):
+        """Process the recognized text by sending it to the shared state."""
+        # Simple pre-processing: trim and ignore empty text.
+        text = text.strip()
+        if not text:
+            logger.debug("STTModule: Empty transcription received; ignoring.")
+            return
+
+        logger.info(f"STTModule: Transcribed text received: {text}")
+        # Update the state with the new message
+        self.state.add_new_message(text)
+        logger.debug("STTModule: Added new message to state.")
+
+    def run(self):
+        """Continuously capture audio and convert to text."""
+        logger.info("STTModule: Running STT module.")
+        try:
+            while not self.state.shutdown:
+                if self.recorder:
+                    self.recorder.text(self.process_text)
+                time.sleep(0.1)
+        except Exception as e:
+            logger.error(f"STTModule: Error during transcription: {e}")
+            logger.debug(traceback.format_exc())
+        finally:
+            logger.info("STTModule: Exiting STT module.")

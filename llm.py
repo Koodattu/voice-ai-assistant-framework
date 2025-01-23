@@ -1,51 +1,41 @@
-# llm.py (example changes)
-
 import requests
-import traceback
 from state import State
 from constants import LLM_API_URL, LLM_MODEL
+from logger import logger
 
 class LLMModule:
     def __init__(self, state: State):
         self.state = state
+        logger.debug("LLMModule initialized with state.")
 
-    def generate_response(self, prompt: str):
+    def generate_response(self, prompt: str) -> str:
         """
-        For normal user-facing conversation.
+        Sends a prompt to the LLM and retrieves the response.
         """
-        with self.state.lock:
-            self.state.ai_thinking = True
+        self.state.ai_thinking = True  # Atomic assignment in CPython
+        logger.debug("LLMModule: AI is now thinking.")
 
         try:
-            payload = {"prompt": prompt, "model": LLM_MODEL, "stream": False}
-            print(f"[LLM] Sending user conversation prompt to Ollama.")
-            response = requests.post(f"{LLM_API_URL}", json=payload, timeout=30)
+            payload = {
+                "prompt": prompt,
+                "model": LLM_MODEL,
+                "stream": False
+            }
+            logger.info("LLMModule: Sending prompt to LLM.")
+            logger.debug(f"LLMModule: Payload: {payload}")
+            response = requests.post(LLM_API_URL, json=payload, timeout=30)
             response.raise_for_status()
             data = response.json()
             ai_response = data.get("response", "")
-        except Exception as e:
-            print("[LLM] Exception:", e)
-            traceback.print_exc()
+            logger.debug(f"LLMModule: Received response: {ai_response}")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"LLMModule: Error communicating with LLM API: {e}")
+            ai_response = "(Error retrieving response)"
+        except KeyError:
+            logger.error("LLMModule: Unexpected response format from LLM API.")
             ai_response = "(Error retrieving response)"
         finally:
-            with self.state.lock:
-                self.state.ai_thinking = False
+            self.state.ai_thinking = False  # Atomic assignment
+            logger.debug("LLMModule: AI has stopped thinking.")
 
         return ai_response
-
-    def generate_response_for_memory(self, prompt: str):
-        """
-        Possibly the same or nearly the same as generate_response,
-        but you can handle different parameters or system prompts if desired.
-        """
-        try:
-            print("[LLM] Sending memory-summarization prompt to Ollama.")
-            payload = {"prompt": prompt, "model": LLM_MODEL, "stream": False}
-            response = requests.post(f"{LLM_API_URL}", json=payload, timeout=30)
-            response.raise_for_status()
-            data = response.json()
-            return data.get("response", "")
-        except Exception as e:
-            print("[LLM] Exception in memory summarization:", e)
-            traceback.print_exc()
-            return "(Error summarizing memory)"

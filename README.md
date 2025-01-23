@@ -7,6 +7,7 @@
 1. Requires Python 3.11.x and CUDA 12.x
 2. Install following
    pip install sounddevice
+   pip install chromadb
    pip install realtimestt
    pip install realtimetts[all]
    pip install torch==2.2.1+cu118 torchaudio==2.2.1+cu118 torchvision==0.17.1+cu118 --index-url https://download.pytorch.org/whl/cu118

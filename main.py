@@ -1,62 +1,60 @@
-# main.py
-
 import threading
 import time
 import signal
+from logger import logger
 
 from state import State
 from stt import STTModule
 from tts import TTSModule
 from llm import LLMModule
 from orchestrator import Orchestrator
+from memory import MemoryManager
 
 def main():
-    print("[Main] Starting...")
+    logger.info("Main: Starting the system.")
     state = State()
 
-    print("[Main] Creating modules...")
+    logger.info("Main: Creating modules.")
     # Create module instances
     stt_module = STTModule(state)
     tts_module = TTSModule(state)
     llm_module = LLMModule(state)
-    orchestrator = Orchestrator(state, llm_module, tts_module)
+    memory_manager = MemoryManager(state)
+    orchestrator = Orchestrator(state, llm_module, tts_module, memory_manager)
 
-    print("[Main] Starting threads...")
+    logger.info("Main: Starting threads.")
     # Threads
     stt_thread = threading.Thread(target=stt_module.run, name="STTThread", daemon=True)
     tts_thread = threading.Thread(target=tts_module.run, name="TTSThread", daemon=True)
     orchestrator_thread = threading.Thread(target=orchestrator.run, name="OrchestratorThread", daemon=True)
+    memory_thread = threading.Thread(target=memory_manager.run, name="MemoryThread", daemon=True)
 
-    print("[Main] Starting modules...")
-    # Start
+    logger.info("Main: Starting module threads.")
+    # Start threads
     stt_thread.start()
     tts_thread.start()
     orchestrator_thread.start()
+    memory_thread.start()
 
     # Handle Ctrl+C
     def signal_handler(sig, frame):
-        print("[Main] Caught Ctrl+C, requesting shutdown...")
-        with state.lock:
-            state.shutdown = True
+        logger.info("Main: Caught Ctrl+C, requesting shutdown...")
+        state.shutdown = True
 
     signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
 
-    print("[Main] Ready. Press Ctrl+C to exit.")
+    logger.info("Main: System is ready. Press Ctrl+C to exit.")
     # Main thread wait loop
     try:
-        while True:
+        while not state.shutdown:
             time.sleep(0.5)
-            with state.lock:
-                if state.shutdown:
-                    break
     except KeyboardInterrupt:
-        pass
+        logger.info("Main: KeyboardInterrupt received.")
     finally:
-        print("[Main] Joining threads...")
-        stt_thread.join()
-        tts_thread.join()
-        orchestrator_thread.join()
-        print("[Main] Shutdown complete.")
+        logger.info("Main: Shutdown signal received. Waiting for threads to finish...")
+        # Threads are daemons and will exit automatically
+        logger.info("Main: Shutdown complete.")
 
 if __name__ == "__main__":
     main()

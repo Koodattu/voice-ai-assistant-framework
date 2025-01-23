@@ -172,3 +172,5 @@ cython_debug/
 /models
 voice-sample.wav
 voice-sample.json
+/chromadb
+/voice-samples/own
