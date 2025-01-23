@@ -18,15 +18,17 @@ class STTModule:
 
     def recording_start(self):
         """Callback when recording starts."""
+        print("[STT] Recording started.")
         with self.state.lock:
             self.state.user_talking = True
-        print("[STT] Recording started.")
+            print("[STT] Set state user_talking: True.")
 
     def recording_stop(self):
         """Callback when recording stops."""
+        print("[STT] Recording stopped.")
         with self.state.lock:
             self.state.user_talking = False
-        print("[STT] Recording stopped.")
+            print("[STT] Set state user_talking: False.")
 
     def process_text(self, text: str):
         """Process the recognized text by sending it to the shared state."""
@@ -40,6 +42,7 @@ class STTModule:
         with self.state.lock:
             self.state.add_new_message(text)
             self.state.last_message_timestamp = time.time()
+            print("[STT] Added new message to state.")
 
     def run(self):
         """Continuously capture audio and convert to text."""
@@ -54,7 +57,7 @@ class STTModule:
             'input_device_index': AUDIO_DEVICE_INPUT_ID,  # using our constant
             'silero_sensitivity': 0.6,
             'silero_use_onnx': True,
-            'post_speech_silence_duration': 0.4,  # adjust as needed
+            'post_speech_silence_duration': 2.4,  # adjust as needed
             'min_length_of_recording': 0.0,
             'min_gap_between_recordings': 0.2,
             'enable_realtime_transcription': False,
@@ -79,6 +82,7 @@ class STTModule:
                     # The recorder's .text() method calls our process_text() callback whenever new
                     # transcription output is available.
                     recorder.text(self.process_text)
+                    time.sleep(0.1)
         except Exception as e:
             print("[STT] Exception:", e)
             traceback.print_exc()

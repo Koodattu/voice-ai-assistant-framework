@@ -19,7 +19,7 @@ class TTSModule:
         # Adjust the voice path and parameters as desired.
         try:
             self.engine = CoquiEngine(
-                #use_deepspeed=True,
+                use_deepspeed=True,
                 # The engine will load and prepare the voice-sample.
                 voice="voice-sample.wav",  # path to your voice sample file
                 speed=1.0  # Adjust synthesis speed as needed

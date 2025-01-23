@@ -5,7 +5,7 @@ import time
 
 class State:
     def __init__(self):
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
         self.shutdown = False
 
         # Flags

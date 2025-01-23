@@ -3,7 +3,7 @@
 import requests
 import traceback
 from state import State
-from constants import LLM_API_URL
+from constants import LLM_API_URL, LLM_MODEL
 
 class LLMModule:
     def __init__(self, state: State):
@@ -17,12 +17,12 @@ class LLMModule:
             self.state.ai_thinking = True
 
         try:
-            payload = {"prompt": prompt}
+            payload = {"prompt": prompt, "model": LLM_MODEL, "stream": False}
             print(f"[LLM] Sending user conversation prompt to Ollama.")
-            response = requests.post(f"{LLM_API_URL}/generate", json=payload, timeout=30)
+            response = requests.post(f"{LLM_API_URL}", json=payload, timeout=30)
             response.raise_for_status()
             data = response.json()
-            ai_response = data.get("generated_text", "")
+            ai_response = data.get("response", "")
         except Exception as e:
             print("[LLM] Exception:", e)
             traceback.print_exc()
@@ -40,11 +40,11 @@ class LLMModule:
         """
         try:
             print("[LLM] Sending memory-summarization prompt to Ollama.")
-            payload = {"prompt": prompt}
-            response = requests.post(f"{LLM_API_URL}/generate", json=payload, timeout=30)
+            payload = {"prompt": prompt, "model": LLM_MODEL, "stream": False}
+            response = requests.post(f"{LLM_API_URL}", json=payload, timeout=30)
             response.raise_for_status()
             data = response.json()
-            return data.get("generated_text", "")
+            return data.get("response", "")
         except Exception as e:
             print("[LLM] Exception in memory summarization:", e)
             traceback.print_exc()
