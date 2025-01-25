@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 import sounddevice as sd
 from logger import logger
 

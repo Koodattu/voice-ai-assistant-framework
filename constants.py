@@ -1,8 +1,8 @@
 # constants.py
 
 # Audio device configuration
-AUDIO_DEVICE_INPUT_ID = 1     # Adjust to your actual device ID for input (where does the AI hear from)
-AUDIO_DEVICE_OUTPUT_ID = 32    # Adjust to your actual device ID for output (where does the AI speak to)
+AUDIO_DEVICE_INPUT_ID = 3#1     # Adjust to your actual device ID for input (where does the AI hear from)
+AUDIO_DEVICE_OUTPUT_ID = 22#32    # Adjust to your actual device ID for output (where does the AI speak to)
 WHISPER_MODEL = "deepdml/faster-whisper-large-v3-turbo-ct2"  # Model for STT
 
 VOICE_SAMPLE = "./voice-sample/own/juha.wav"  # Path to the voice sample for TTS
