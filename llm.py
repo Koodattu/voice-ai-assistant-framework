@@ -1,18 +1,12 @@
 import requests
-from state import State
 from constants import LLM_API_URL, LLM_MODEL
 from logger import logger
 
 class LLMModule:
-    def __init__(self, state: State):
-        self.state = state
-        logger.debug("LLMModule initialized with state.")
-
-    def generate_response(self, prompt: str) -> str:
+    def generate_response(prompt: str) -> str:
         """
         Sends a prompt to the LLM and retrieves the response.
         """
-        self.state.ai_thinking = True  # Atomic assignment in CPython
         logger.debug("LLMModule: AI is now thinking.")
 
         try:
@@ -35,7 +29,6 @@ class LLMModule:
             logger.error("LLMModule: Unexpected response format from LLM API.")
             ai_response = "(Error retrieving response)"
         finally:
-            self.state.ai_thinking = False  # Atomic assignment
             logger.debug("LLMModule: AI has stopped thinking.")
 
         return ai_response

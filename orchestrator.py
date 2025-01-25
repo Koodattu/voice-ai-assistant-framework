@@ -5,12 +5,12 @@ from llm import LLMModule
 from tts import TTSModule
 from memory import MemoryManager
 from logger import logger
+from prompter import Prompter
 
 class Orchestrator:
-    def __init__(self, state: State, llm_module: LLMModule, tts_module: TTSModule, memory_manager: MemoryManager):
+    def __init__(self, state: State, tts_module: TTSModule, memory_manager: MemoryManager):
         logger.info("Orchestrator: Initializing orchestrator module.")
         self.state = state
-        self.llm_module = llm_module
         self.tts_module = tts_module
         self.memory_manager = memory_manager
 
@@ -54,13 +54,15 @@ class Orchestrator:
         if self.state.user_talking or self.state.ai_talking or self.state.ai_thinking:
             logger.info("Orchestrator: Detected that the AI or user is busy; skipping prompt.")
             return
+        
+        self.state.ai_thinking = True  # Atomic assignment in CPython
 
         # Build the final prompt using MemoryManager
-        final_prompt = self.memory_manager.build_prompt_for_llm(last_user_message)
+        final_prompt = Prompter.build_prompt(self.state, self.memory_manager, last_user_message)
         logger.debug(f"Orchestrator: Final prompt for LLM:\n{final_prompt}")
 
         # Query the LLM
-        ai_response = self.llm_module.generate_response(final_prompt)
+        ai_response = LLMModule.generate_response(final_prompt)
         logger.info("Orchestrator: Received AI response.")
 
         # Add to short-term memory
@@ -72,3 +74,4 @@ class Orchestrator:
         # Send response to TTS
         self.tts_module.speak(ai_response)
         logger.info("Orchestrator: AI response sent to TTS module.")
+        self.state.ai_thinking = False  # Atomic assignment

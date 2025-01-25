@@ -18,23 +18,22 @@ def main():
     # Create module instances
     stt_module = STTModule(state)
     tts_module = TTSModule(state)
-    llm_module = LLMModule(state)
     memory_manager = MemoryManager(state)
-    orchestrator = Orchestrator(state, llm_module, tts_module, memory_manager)
+    orchestrator = Orchestrator(state, tts_module, memory_manager)
 
     logger.info("Main: Starting threads.")
     # Threads
     stt_thread = threading.Thread(target=stt_module.run, name="STTThread", daemon=True)
     tts_thread = threading.Thread(target=tts_module.run, name="TTSThread", daemon=True)
-    orchestrator_thread = threading.Thread(target=orchestrator.run, name="OrchestratorThread", daemon=True)
     memory_thread = threading.Thread(target=memory_manager.run, name="MemoryThread", daemon=True)
+    orchestrator_thread = threading.Thread(target=orchestrator.run, name="OrchestratorThread", daemon=True)
 
     logger.info("Main: Starting module threads.")
     # Start threads
     stt_thread.start()
     tts_thread.start()
-    orchestrator_thread.start()
     memory_thread.start()
+    orchestrator_thread.start()
 
     # Handle Ctrl+C
     def signal_handler(sig, frame):

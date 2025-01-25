@@ -1,8 +1,10 @@
+import sys
+sys.path.append("..")
 import chromadb
 from chromadb.config import Settings
 
 # Configure the ChromaDB client
-CHROMA_PERSIST_DIRECTORY = "./chroma.db"  # Adjust this path to your database directory
+CHROMA_PERSIST_DIRECTORY = "./chromadb"  # Adjust this path to your database directory
 OUTPUT_FILE = "chroma_memories.txt"  # Output file for storing memories
 
 def fetch_and_save_memories():

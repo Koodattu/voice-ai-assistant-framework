@@ -174,3 +174,4 @@ voice-sample.wav
 voice-sample.json
 /chromadb
 /voice-samples/own
+chroma_memories.txt
