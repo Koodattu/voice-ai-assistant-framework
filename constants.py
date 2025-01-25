@@ -10,19 +10,48 @@ VOICE_SAMPLE = "./voice-samples/own/niilo.wav"  # Path to the voice sample for T
 # LLM configuration
 LLM_API_URL = "http://localhost:11434/api/generate"  # Example local Ollama instance
 LLM_MODEL = "qwen2.5:7b-instruct-q4_K_M"  # Model for LLM
-PATIENCE_SECONDS = 50  # Number of seconds to wait before prompting the LLM if no new messages
 
 # MEMORY SECTION: Constants relevant to forming new memories
 MEMORY_RECALL_COUNT = 5 # How many memories to recall and insert into context
 CHROMA_PERSIST_DIRECTORY = "./chromadb" # Path to ChromaDB persistent storage
 MEMORY_INTERVAL = 10 # How many messages before generating a short summary
 
-# The AI assistant's "identity"
-AI_NAME = "Merlin"
+# AI operational modes
+AI_MODE_CONVERSATION = "conversation"
+AI_MODE_DISCUSSION = "discussion"
 
-# A system prompt to guide the AI’s style and behavior
+# Choose the default mode here:
+AI_MODE = AI_MODE_DISCUSSION  # or AI_MODE_DISCUSSION
+
+AI_NAME = "Niilo"  # The AI's name
+
+# A system prompt to guide the AI’s style and behavior; we incorporate the modes.
 SYSTEM_PROMPT = (
-    "You are {AI_NAME}, a friendly AI assistant with a calm, concise style.\n"
-    "You should respond to questions or context with short, direct answers.\n"
-    "Avoid extra words unless necessary.\n"
+    "You are {AI_NAME}, an AI assistant. You have two modes:\n"
+    "- conversation: You always respond to user messages (shortly)\n"
+    "- discussion: You speak only if your name is mentioned or if a long silence passed.\n"
+    "You also maintain an internal monologue or 'notebook' that is not spoken.\n"
+    "Please put any longer reasoning or chain-of-thought inside 'internalMonologue'."
+    "Keep 'reply' short unless you are asked for a longer explanation by name or the conversation mode is 'conversation'."
+    "Set 'wantsToSpeak' to true if you want to speak the 'reply'."
+    "You can also talk in discussion mode if you have something important to say or there has been a long silence or your name is mentioned."
+    "Your output must be valid JSON with these fields:\n"
+    "  wantsToSpeak: boolean\n"
+    "  reply: short string (the spoken reply if wantsToSpeak == true)\n"
+    "  internalMonologue: longer text describing your hidden thoughts\n"
+    "Current mode is: {AI_MODE}\n"
+    "IMPORTANT: Output ONLY valid JSON, no extra text.\n"
 )
+
+# For Ollama's structured output feature, we can define a schema:
+OLLAMA_JSON_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "wantsToSpeak": {"type": "boolean"},
+        "reply": {"type": "string"},
+        "internalMonologue": {"type": "string"}
+    },
+    "required": ["wantsToSpeak", "reply", "internalMonologue"]
+}
+
+SILENCE_THRESHOLD = 15 # Number of seconds to wait before prompting the LLM if no new messages

@@ -4,6 +4,7 @@ from logger import logger
 class State:
     def __init__(self):
         self.shutdown = False
+        self.system_ready = False
 
         # Flags
         self.user_talking = False

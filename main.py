@@ -2,11 +2,10 @@ import threading
 import time
 import signal
 from logger import logger
-
+from constants import AI_NAME
 from state import State
 from stt import STTModule
 from tts import TTSModule
-from llm import LLMModule
 from orchestrator import Orchestrator
 from memory import MemoryManager
 
@@ -44,6 +43,9 @@ def main():
     signal.signal(signal.SIGTERM, signal_handler)
 
     logger.info("Main: System is ready. Press Ctrl+C to exit.")
+    tts_module.speak(f"Hello, I am {AI_NAME}, your AI assistant. How can I help you today?")
+    state.last_message_timestamp = time.time()
+    state.system_ready = True
     # Main thread wait loop
     try:
         while not state.shutdown:
