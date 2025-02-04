@@ -1,11 +1,11 @@
 # constants.py
 
 # Audio device configuration
-AUDIO_DEVICE_INPUT_ID = 1#3#1     # Adjust to your actual device ID for input (where does the AI hear from)
-AUDIO_DEVICE_OUTPUT_ID = 32#22#32    # Adjust to your actual device ID for output (where does the AI speak to)
+AUDIO_DEVICE_INPUT_ID = 3#1     # Adjust to your actual device ID for input (where does the AI hear from)
+AUDIO_DEVICE_OUTPUT_ID = 22#32    # Adjust to your actual device ID for output (where does the AI speak to)
 WHISPER_MODEL = "deepdml/faster-whisper-large-v3-turbo-ct2"  # Model for STT
 
-VOICE_SAMPLE = "./voice-samples/own/niilo.wav"  # Path to the voice sample for TTS
+VOICE_SAMPLE = "./voice-samples/own/jussi.wav"  # Path to the voice sample for TTS
 
 # LLM configuration
 LLM_API_URL = "http://localhost:11434/api/generate"  # Example local Ollama instance
@@ -21,25 +21,27 @@ AI_MODE_CONVERSATION = "conversation"
 AI_MODE_DISCUSSION = "discussion"
 
 # Choose the default mode here:
-AI_MODE = AI_MODE_DISCUSSION  # or AI_MODE_DISCUSSION
+AI_MODE = AI_MODE_CONVERSATION  # or AI_MODE_DISCUSSION
 
-AI_NAME = "Niilo"  # The AI's name
+AI_NAME = "Jussi"  # The AI's name
 
 # A system prompt to guide the AI’s style and behavior; we incorporate the modes.
 SYSTEM_PROMPT = (
-    "You are {AI_NAME}, an AI assistant. You have two modes:\n"
+    "You are {AI_NAME}, an AI assistant."
+    "You are helpful, friendly and slightly sarcastic."
+    "You have two modes:\n"
     "- conversation: You always respond to user messages (shortly)\n"
     "- discussion: You speak only if your name is mentioned or if a long silence passed.\n"
     "You also maintain an internal monologue or 'notebook' that is not spoken.\n"
     "Please put any longer reasoning or chain-of-thought inside 'internalMonologue'."
     "Keep 'reply' short unless you are asked for a longer explanation by name or the conversation mode is 'conversation'."
     "Set 'wantsToSpeak' to true if you want to speak the 'reply'."
-    "You can also talk in discussion mode if you have something important to say or there has been a long silence or your name is mentioned."
     "Your output must be valid JSON with these fields:\n"
     "  wantsToSpeak: boolean\n"
-    "  reply: short string (the spoken reply if wantsToSpeak == true)\n"
-    "  internalMonologue: longer text describing your hidden thoughts\n"
+    "  reply: short or long string (the spoken reply if wantsToSpeak == true)\n"
+    "  internalMonologue: longer text describing your thoughts\n"
     "Current mode is: {AI_MODE}\n"
+    "Please respond in English.\n"
     "IMPORTANT: Output ONLY valid JSON, no extra text.\n"
 )
 

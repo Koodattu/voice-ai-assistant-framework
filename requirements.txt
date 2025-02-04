@@ -3,3 +3,6 @@ realtimetts[all]
 torch --extra-index-url https://download.pytorch.org/whl/cu121
 torchvision --extra-index-url https://download.pytorch.org/whl/cu121
 torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
+pyautogui
+opencv-python
+pyvirtualcam
