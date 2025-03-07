@@ -1,11 +1,11 @@
 # constants.py
 
 # Audio device configuration
-AUDIO_DEVICE_INPUT_ID = 3#1     # Adjust to your actual device ID for input (where does the AI hear from)
-AUDIO_DEVICE_OUTPUT_ID = 22#32    # Adjust to your actual device ID for output (where does the AI speak to)
+AUDIO_DEVICE_INPUT_ID = 4#1     # Adjust to your actual device ID for input (where does the AI hear from)
+AUDIO_DEVICE_OUTPUT_ID = 23#32    # Adjust to your actual device ID for output (where does the AI speak to)
 WHISPER_MODEL = "deepdml/faster-whisper-large-v3-turbo-ct2"  # Model for STT
 
-VOICE_SAMPLE = "./voice-samples/own/jussi.wav"  # Path to the voice sample for TTS
+VOICE_SAMPLE = "./voice-samples/own/juha.wav"  # Path to the voice sample for TTS
 
 # LLM configuration
 LLM_API_URL = "http://localhost:11434/api/generate"  # Example local Ollama instance
@@ -23,7 +23,7 @@ AI_MODE_DISCUSSION = "discussion"
 # Choose the default mode here:
 AI_MODE = AI_MODE_CONVERSATION  # or AI_MODE_DISCUSSION
 
-AI_NAME = "Jussi"  # The AI's name
+AI_NAME = "Juha"  # The AI's name
 
 # A system prompt to guide the AI’s style and behavior; we incorporate the modes.
 SYSTEM_PROMPT = (
@@ -41,7 +41,7 @@ SYSTEM_PROMPT = (
     "  reply: short or long string (the spoken reply if wantsToSpeak == true)\n"
     "  internalMonologue: longer text describing your thoughts\n"
     "Current mode is: {AI_MODE}\n"
-    "Please respond in English.\n"
+    "Please write the reply in English.\n"
     "IMPORTANT: Output ONLY valid JSON, no extra text.\n"
 )
 
@@ -56,4 +56,6 @@ OLLAMA_JSON_SCHEMA = {
     "required": ["wantsToSpeak", "reply", "internalMonologue"]
 }
 
-SILENCE_THRESHOLD = 15 # Number of seconds to wait before prompting the LLM if no new messages
+SILENCE_THRESHOLD = 150000 # Number of seconds to wait before prompting the LLM if no new messages
+# Delay before sending the initial greeting when a call starts.
+INITIAL_GREETING_DELAY = 3  # seconds
