@@ -1,8 +1,11 @@
+openai
+python-dotenv
+requests
+sounddevice
+huggingface_hub[hf_xet]
 RealtimeSTT
-realtimetts[all]
-torch --extra-index-url https://download.pytorch.org/whl/cu121
-torchvision --extra-index-url https://download.pytorch.org/whl/cu121
-torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
-pyautogui
-opencv-python
-pyvirtualcam
+realtimetts[coqui]
+f5-tts
+torch --extra-index-url https://download.pytorch.org/whl/cu118
+torchvision --extra-index-url https://download.pytorch.org/whl/cu118
+torchaudio --extra-index-url https://download.pytorch.org/whl/cu118

@@ -1,28 +1,20 @@
-# orchestrator.py
 import time
 from state import State
-from constants import AI_MODE, AI_NAME, AI_MODE_CONVERSATION, AI_MODE_DISCUSSION, SILENCE_THRESHOLD
+from config import AI_MODE, AI_NAME, AI_MODE_CONVERSATION, AI_MODE_DISCUSSION, SILENCE_THRESHOLD
 from llm import LLMModule
-from tts import TTSModule
-from memory import MemoryManager
+from tts_realtimetts import TTSModule
 from logger import logger
 from prompter import Prompter
 
 class Orchestrator:
-    def __init__(self, state: State, tts_module: TTSModule, memory_manager: MemoryManager):
+    def __init__(self, state: State, tts_module: TTSModule):
         logger.info("Orchestrator: Initializing orchestrator module.")
         self.state = state
         self.tts_module = tts_module
-        self.memory_manager = memory_manager
 
     def run(self):
         logger.info("Orchestrator: Starting orchestrator module.")
         while not self.state.shutdown:
-            # Only process if we are in a call
-            if not self.state.in_call:
-                time.sleep(0.1)
-                continue
-
             # Define state flags
             system_ready = self.state.system_ready
             user_busy = self.state.user_talking
@@ -54,7 +46,7 @@ class Orchestrator:
 
         self.state.ai_thinking = True
         # Build prompt using only the recent conversation (last 10 messages are in state.short_term)
-        prompt = Prompter.build_prompt(self.state, self.memory_manager, last_user_message)
+        prompt = Prompter.build_prompt(self.state, last_user_message)
         response_dict = LLMModule.generate_json_response(prompt)
 
         wants_to_speak = response_dict.get("wantsToSpeak", False)

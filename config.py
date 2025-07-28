@@ -1,20 +1,15 @@
-# constants.py
-
 # Audio device configuration
-AUDIO_DEVICE_INPUT_ID = 4#1     # Adjust to your actual device ID for input (where does the AI hear from)
-AUDIO_DEVICE_OUTPUT_ID = 23#32    # Adjust to your actual device ID for output (where does the AI speak to)
-WHISPER_MODEL = "deepdml/faster-whisper-large-v3-turbo-ct2"  # Model for STT
+AUDIO_DEVICE_INPUT_ID = 1     # Adjust to your actual device ID for input (where does the AI hear from)
+AUDIO_DEVICE_OUTPUT_ID = 32    # Adjust to your actual device ID for output (where does the AI speak to)
+WHISPER_MODEL = "turbo"  # Model for STT
 
-VOICE_SAMPLE = "./voice-samples/own/juha.wav"  # Path to the voice sample for TTS
+VOICE_SAMPLE_WAV = "./voice-data/ref_fin.wav"  # Path to the voice sample for TTS
+VOICE_SAMPLE_TXT = "./voice-data/ref_fin.txt"  # Path to the text sample for F5-TTS
+VOCAB_TXT = "./voice-data/vocab_fin.txt"  # Vocabulary file for F5-TTS
 
 # LLM configuration
 LLM_API_URL = "http://localhost:11434/api/generate"  # Example local Ollama instance
-LLM_MODEL = "qwen2.5:7b-instruct-q4_K_M"  # Model for LLM
-
-# MEMORY SECTION: Constants relevant to forming new memories
-MEMORY_RECALL_COUNT = 5 # How many memories to recall and insert into context
-CHROMA_PERSIST_DIRECTORY = "./chromadb" # Path to ChromaDB persistent storage
-MEMORY_INTERVAL = 10 # How many messages before generating a short summary
+LLM_MODEL = "hf.co/mradermacher/Llama-Poro-2-8B-Instruct-GGUF:Q4_K_M"  # Model for LLM
 
 # AI operational modes
 AI_MODE_CONVERSATION = "conversation"
@@ -23,7 +18,7 @@ AI_MODE_DISCUSSION = "discussion"
 # Choose the default mode here:
 AI_MODE = AI_MODE_CONVERSATION  # or AI_MODE_DISCUSSION
 
-AI_NAME = "Juha"  # The AI's name
+AI_NAME = "Juha"
 
 # A system prompt to guide the AI’s style and behavior; we incorporate the modes.
 SYSTEM_PROMPT = (
@@ -41,7 +36,7 @@ SYSTEM_PROMPT = (
     "  reply: short or long string (the spoken reply if wantsToSpeak == true)\n"
     "  internalMonologue: longer text describing your thoughts\n"
     "Current mode is: {AI_MODE}\n"
-    "Please write the reply in English.\n"
+    "Please write the reply in same language as the user is speaking.\n"
     "IMPORTANT: Output ONLY valid JSON, no extra text.\n"
 )
 
@@ -56,6 +51,7 @@ OLLAMA_JSON_SCHEMA = {
     "required": ["wantsToSpeak", "reply", "internalMonologue"]
 }
 
-SILENCE_THRESHOLD = 150000 # Number of seconds to wait before prompting the LLM if no new messages
-# Delay before sending the initial greeting when a call starts.
 INITIAL_GREETING_DELAY = 3  # seconds
+
+# Silence threshold in seconds
+SILENCE_THRESHOLD = 15  # seconds, how long to wait before generating a response if no user input

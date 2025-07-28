@@ -1,8 +1,7 @@
-# tts.py
 import time
 import traceback
 from state import State
-from constants import AUDIO_DEVICE_OUTPUT_ID, VOICE_SAMPLE
+from config import AUDIO_DEVICE_OUTPUT_ID, VOICE_SAMPLE_WAV
 from RealtimeTTS import TextToAudioStream, CoquiEngine
 from logger import logger
 
@@ -13,7 +12,7 @@ class TTSModule:
         try:
             engine = CoquiEngine(
                 use_deepspeed=True,
-                voice=VOICE_SAMPLE,
+                voice=VOICE_SAMPLE_WAV,
                 speed=1,
             )
             logger.info("TTSModule: CoquiEngine initialized successfully.")
@@ -46,11 +45,6 @@ class TTSModule:
         logger.info("TTSModule: Audio ended (AI is done speaking).")
 
     def speak(self, text: str):
-        # Only speak if in a call.
-        if not self.state.in_call:
-            logger.info("TTSModule: Not in a call; not speaking.")
-            return
-
         if not self.stream:
             logger.warning("TTSModule: TextToAudioStream not initialized. Cannot speak.")
             return

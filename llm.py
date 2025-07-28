@@ -1,5 +1,5 @@
 import requests
-from constants import LLM_API_URL, LLM_MODEL, OLLAMA_JSON_SCHEMA
+from config import LLM_API_URL, LLM_MODEL, OLLAMA_JSON_SCHEMA
 from logger import logger
 
 class LLMModule:
@@ -35,7 +35,7 @@ class LLMModule:
 
     def generate_json_response(prompt: str) -> dict:
         """
-        Sends a prompt to the LLM in JSON mode. 
+        Sends a prompt to the LLM in JSON mode.
         Expects the "response" field to contain valid JSON.
         """
         payload = {
@@ -56,7 +56,7 @@ class LLMModule:
             response = requests.post(LLM_API_URL, json=payload, timeout=30)
             response.raise_for_status()
             data = response.json()
-            # The "response" field in the JSON is the model’s raw string. 
+            # The "response" field in the JSON is the model’s raw string.
             # It should be a JSON string we can parse again.
             raw_json_str = data.get("response", "{}").strip()
             logger.debug(f"LLMModule: Raw JSON string from LLM: {raw_json_str}")

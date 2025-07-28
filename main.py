@@ -1,15 +1,13 @@
-# main.py
 import threading
 import time
 import signal
 from logger import logger
-from constants import AI_NAME
+from config import AI_NAME
 from state import State
-from stt import STTModule
-from tts import TTSModule
+from stt_realtimestt import STTModule
+from tts_realtimetts import TTSModule
+from tts_f5tts import F5TTSModule
 from orchestrator import Orchestrator
-from memory import MemoryManager
-from whatsapp.whatsapp import run_whatsapp  # Import the WhatsApp function
 
 def main():
     logger.info("Main: Starting the system.")
@@ -18,24 +16,19 @@ def main():
     logger.info("Main: Creating modules.")
     # Create module instances
     stt_module = STTModule(state)
-    tts_module = TTSModule(state)
-    memory_manager = MemoryManager(state)
-    orchestrator = Orchestrator(state, tts_module, memory_manager)
+    tts_module = F5TTSModule(state)
+    orchestrator = Orchestrator(state, tts_module)
 
     logger.info("Main: Starting threads.")
     # Threads for the various modules
     stt_thread = threading.Thread(target=stt_module.run, name="STTThread", daemon=True)
     tts_thread = threading.Thread(target=tts_module.run, name="TTSThread", daemon=True)
-    memory_thread = threading.Thread(target=memory_manager.run, name="MemoryThread", daemon=True)
     orchestrator_thread = threading.Thread(target=orchestrator.run, name="OrchestratorThread", daemon=True)
-    whatsapp_thread = threading.Thread(target=run_whatsapp, args=(state,), name="WhatsAppThread", daemon=True)
 
     logger.info("Main: Starting module threads.")
     stt_thread.start()
     tts_thread.start()
-    memory_thread.start()
     orchestrator_thread.start()
-    whatsapp_thread.start()
 
     # Handle Ctrl+C
     def signal_handler(sig, frame):

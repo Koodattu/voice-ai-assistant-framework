@@ -1,4 +1,3 @@
-# logger.py
 import logging
 import os
 import sys
@@ -26,19 +25,19 @@ if not hasattr(logger, '_handlers_initialized'):
         import io
         console_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
         console_handler = logging.StreamHandler(console_stream)
-    
+
     console_handler.setLevel(logging.INFO)  # Only show INFO and above in console
     console_handler.setFormatter(logging.Formatter('%(message)s'))
-    
+
     # Create file handler which logs even debug messages
     file_handler = RotatingFileHandler(LOG_FILE, maxBytes=5*1024*1024, backupCount=5, encoding='utf-8')
     file_handler.setLevel(logging.DEBUG)  # Log all details to file
     file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     file_handler.setFormatter(file_formatter)
-    
+
     # Add handlers to the logger
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
-    
+
     # Mark handlers as initialized
     logger._handlers_initialized = True

@@ -1,8 +1,7 @@
-# stt.py
 import time
 import logging
 from state import State
-from constants import AUDIO_DEVICE_INPUT_ID, WHISPER_MODEL
+from config import AUDIO_DEVICE_INPUT_ID, WHISPER_MODEL
 from RealtimeSTT import AudioToTextRecorder
 import traceback
 from logger import logger
@@ -22,7 +21,10 @@ class STTModule:
             'post_speech_silence_duration': 0.6,
             'min_length_of_recording': 0.0,
             'min_gap_between_recordings': 0.2,
-            'enable_realtime_transcription': False,
+            'enable_realtime_transcription': True,
+            'on_realtime_transcription_stabilized': self.realtime_stabilized,
+            'on_realtime_transcription_update': self.realtime_update,
+            'realtime_model_type': 'small',
             'compute_type': 'auto',
             'on_recording_start': self.recording_start,
             'on_recording_stop': self.recording_stop,
@@ -35,6 +37,12 @@ class STTModule:
         except Exception as e:
             logger.error(f"STTModule: Failed to initialize AudioToTextRecorder: {e}")
             self.recorder = None
+
+    def realtime_stabilized(self, text: str):
+        logger.info(f"STTModule: Realtime transcription stabilized: {text}")
+
+    def realtime_update(self, text: str):
+        logger.debug(f"STTModule: Realtime transcription update: {text}")
 
     def recording_start(self):
         logger.info("STTModule: Recording started.")
@@ -50,11 +58,6 @@ class STTModule:
         text = text.strip()
         if not text:
             logger.debug("STTModule: Empty transcription received; ignoring.")
-            return
-
-        # Only process if in a call
-        if not self.state.in_call:
-            logger.info("STTModule: Not in call; ignoring transcription.")
             return
 
         logger.info(f"STTModule: Transcribed text received: {text}")

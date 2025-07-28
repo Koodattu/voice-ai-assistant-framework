@@ -1,4 +1,3 @@
-# state.py
 import time
 from logger import logger
 
@@ -19,14 +18,7 @@ class State:
         self.short_term = []
         self.user_message_count = 0
 
-        # Track last message time for “patience” logic
         self.last_message_timestamp = time.time()
-
-        # WhatsApp call state: True if in a call, False otherwise.
-        self.in_call = False
-
-        # New attribute: unique identifier for the current call
-        self.current_call_id = None
 
         logger.debug("State: Initialized new state.")
 
@@ -42,12 +34,3 @@ class State:
         if len(self.short_term) > 10:
             removed = self.short_term.pop(0)
             logger.debug(f"State: Removed oldest short-term message: {removed}")
-
-    def clear_conversation_history(self):
-        """Clear conversation history and reset the call identifier (called when a call ends)."""
-        self.new_messages.clear()
-        self.short_term.clear()
-        self.user_message_count = 0
-        logger.info("State: Cleared conversation history.")
-        # Reset the call identifier for a fresh start on the next call.
-        self.current_call_id = None
