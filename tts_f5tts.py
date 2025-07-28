@@ -7,6 +7,8 @@ from config import AUDIO_DEVICE_OUTPUT_ID, VOICE_SAMPLE_WAV, VOICE_SAMPLE_TXT, V
 from logger import logger
 import os
 from huggingface_hub import hf_hub_download
+import sounddevice as sd
+import soundfile as sf
 
 class F5TTSModule:
     def __init__(self, state: State):
@@ -14,7 +16,8 @@ class F5TTSModule:
         self.state = state
         self.output_device_index = AUDIO_DEVICE_OUTPUT_ID
         self.voice_sample_wav = VOICE_SAMPLE_WAV
-        self.voice_sample_txt = VOICE_SAMPLE_TXT
+        with open(VOICE_SAMPLE_TXT, "r", encoding="utf-8") as f:
+            self.voice_sample_txt = f.read()
         self.vocab_txt = VOCAB_TXT
         self.audio_dir = os.path.join("generated", "audio", "f5tts")
         os.makedirs(self.audio_dir, exist_ok=True)
@@ -84,10 +87,13 @@ class F5TTSModule:
             logger.debug(traceback.format_exc())
 
     def play_audio(self, filepath):
-        # Implement audio playback using the configured output device
-        # This is a placeholder; you may need to use a library like sounddevice, pyaudio, or similar
         logger.info(f"F5TTSModule: Playing audio file {filepath} on device {self.output_device_index}")
-        # ...existing code...
+        try:
+            data, samplerate = sf.read(filepath, dtype='float32')
+            sd.play(data, samplerate, device=self.output_device_index)
+            sd.wait()  # Wait until playback is finished
+        except Exception as e:
+            logger.error(f"F5TTSModule: Error playing audio: {e}")
 
     def run(self):
         logger.info("F5TTSModule: Running F5-TTS module.")
