@@ -7,6 +7,7 @@ from state import State
 from stt_realtimestt import STTModule
 from tts_realtimetts import TTSModule
 from tts_f5tts import F5TTSModule
+from tts_piper import PiperTTSModule
 from orchestrator import Orchestrator
 
 def main():
@@ -16,7 +17,7 @@ def main():
     logger.info("Main: Creating modules.")
     # Create module instances
     stt_module = STTModule(state)
-    tts_module = F5TTSModule(state)
+    tts_module = PiperTTSModule(state)
     orchestrator = Orchestrator(state, tts_module)
 
     logger.info("Main: Starting threads.")
